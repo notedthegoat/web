@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>뒷삭정리하기</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
+            max-width: 600px;
+            width: 90%;
+            margin: 20px;
+        }
+
+        textarea {
+            width: 97%;
+            height: 100px;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+    <script>
+        function cleanUpFollowers() {
+            const aGroupText = document.getElementById('aGroup').value;
+            const bGroupText = document.getElementById('bGroup').value;
+
+            const aGroupIds = new Set(aGroupText.split(/\n/).map(id => id.trim()).filter(Boolean));
+            const bGroupEntries = bGroupText.split(/\n/).map(id => id.trim()).filter(Boolean);
+
+            // Extract pairs of ID and nickname for B group
+            let uniqueBGroupIds = [];
+            for (let i = 0; i < bGroupEntries.length; i += 2) {
+                const userId = bGroupEntries[i];
+                const nickname = bGroupEntries[i + 1] || "";
+                if (!aGroupIds.has(userId)) {
+                    uniqueBGroupIds.push(`${userId} (${nickname})`);
+                }
+            }
+
+            // Calculate the count of users to be unfollowed
+            const uniqueCount = uniqueBGroupIds.length / 2;
+            document.getElementById('result').value = uniqueBGroupIds.join('\n');
+            document.getElementById('count').innerText = `뒷삭한 인간들: ${Math.floor(uniqueCount)}명`;
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>뒷삭정리하기</h1>
+        <textarea id="aGroup" placeholder="팔로워그룹"></textarea>
+        <textarea id="bGroup" placeholder="팔로잉그룹"></textarea>
+        <button onclick="cleanUpFollowers()">뒷삭정리하기</button>
+        <textarea id="result" placeholder="뒷삭한인간들(Bye~)" readonly></textarea>
+        <p id="count">뒷삭한 인간들: 0명</p>
+    </div>
+</body>
+</html>
