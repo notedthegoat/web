@@ -49,6 +49,10 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        @keyframes popOut {
+            0% { transform: scale(1) translate(0, 0); }
+            100% { transform: scale(2) translate(0, -150px); }
+        }
         #winner {
             font-size: 1.5em;
             color: #4CAF50;
@@ -102,8 +106,13 @@
             });
 
             setTimeout(() => {
-                const winner = nicknames[Math.floor(Math.random() * nicknames.length)];
-                document.getElementById('winner').textContent = `당첨자: ${winner}`;
+                const winnerIndex = Math.floor(Math.random() * nicknames.length);
+                const winner = nicknames[winnerIndex];
+                const winnerElement = circle.children[winnerIndex];
+                winnerElement.style.animation = 'popOut 1s forwards';
+                setTimeout(() => {
+                    document.getElementById('winner').textContent = `당첨자: ${winner}`;
+                }, 1000); // 1초 후에 당첨자 발표
             }, 5000); // 5초 후에 당첨자 발표
         }
     </script>
