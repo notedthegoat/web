@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>타로카드 가이드</title>
+    <style>
+        :root {
+            --background-color: #121212;
+            --card-background: #1e1e1e;
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b3;
+            --accent-color: #bb86fc;
+            --major-color: #ff7597;
+            --minor-color: #03dac6;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--accent-color);
+        }
+
+        .card {
+            background-color: var(--card-background);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+        }
+
+        .card h2 {
+            color: var(--accent-color);
+            margin: 0 0 10px 0;
+            font-size: 1.5em;
+        }
+
+        .card-type {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .card-type.Major {
+            background-color: var(--major-color);
+            color: var(--background-color);
+        }
+
+        .card-type.Minor {
+            background-color: var(--minor-color);
+            color: var(--background-color);
+        }
+
+        .details {
+            display: none;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .details.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .keywords {
+            color: var(--text-secondary);
+            font-style: italic;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: rgba(187, 134, 252, 0.1);
+            border-radius: 5px;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 20px;
+            background-color: var(--card-background);
+            border: 2px solid var(--accent-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        .search-box:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(187, 134, 252, 0.3);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+
+            .card {
+                padding: 15px;
+            }
+
+            .card h2 {
+                font-size: 1.2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>타로카드 가이드</h1>
+        </div>
+        <input type="text" 
+               class="search-box" 
+               placeholder="카드 이름이나 키워드로 검색하세요..." 
+               id="searchBox">
+        <div id="cardList">
+            <!-- Cards will be dynamically inserted here -->
+        </div>
+    </div>
+
+    <script>
+		const tarotCards = [
+			// Major Arcana (0-21)
+			{
+				name: "The Fool",
+				type: "Major",
+				meaning: "새로운 시작, 무한한 가능성, 순수함, 모험",
+				keywords: "새로운 시작, 순수함, 자발성, 믿음의 도약"
+			},
+			{
+				name: "The Magician",
+				type: "Major",
+				meaning: "창조력, 의지력, 숙련된 기술, 자원의 활용",
+				keywords: "창조, 기술, 의지력, 집중력"
+			},
+			{
+				name: "The High Priestess",
+				type: "Major",
+				meaning: "직관, 무의식, 신비, 내면의 지혜",
+				keywords: "직관, 영적 지혜, 비밀, 신성한 여성성"
+			},
+			{
+				name: "The Empress",
+				type: "Major",
+				meaning: "풍요, 창조성, 모성애, 자연과의 조화",
+				keywords: "풍요, 창조성, 모성, 자연"
+			},
+			{
+				name: "The Emperor",
+				type: "Major",
+				meaning: "권위, 구조, 안정성, 보호, 부성",
+				keywords: "권위, 리더십, 안정, 질서"
+			},
+			{
+				name: "The Hierophant",
+				type: "Major",
+				meaning: "전통적 가치관, 영적 지도, 교육, 신념 체계",
+				keywords: "전통, 영적 지도, 종교, 교육"
+			},
+			{
+				name: "The Lovers",
+				type: "Major",
+				meaning: "사랑, 조화, 관계, 가치관의 선택",
+				keywords: "사랑, 파트너십, 선택, 조화"
+			},
+			{
+				name: "The Chariot",
+				type: "Major",
+				meaning: "의지력, 성공, 결단력, 승리",
+				keywords: "승리, 의지력, 결단력, 진전"
+			},
+			{
+				name: "Strength",
+				type: "Major",
+				meaning: "내면의 힘, 용기, 인내, 자제력",
+				keywords: "힘, 용기, 인내, 자제력"
+			},
+			{
+				name: "The Hermit",
+				type: "Major",
+				meaning: "내면의 성찰, 고독, 지혜의 추구",
+				keywords: "성찰, 고독, 내면의 지혜, 안내"
+			},
+			{
+				name: "Wheel of Fortune",
+				type: "Major",
+				meaning: "운명의 변화, 기회, 순환",
+				keywords: "운명, 변화, 순환, 전환점"
+			},
+			{
+				name: "Justice",
+				type: "Major",
+				meaning: "정의, 균형, 진실, 인과응보",
+				keywords: "정의, 균형, 진실, 카르마"
+			},
+			{
+				name: "The Hanged Man",
+				type: "Major",
+				meaning: "희생, 새로운 관점, 중단, 포기",
+				keywords: "희생, 새로운 시각, 중단, 포기"
+			},
+			{
+				name: "Death",
+				type: "Major",
+				meaning: "변환, 종료, 새로운 시작",
+				keywords: "변화, 종료, 변환, 새로운 시작"
+			},
+			{
+				name: "Temperance",
+				type: "Major",
+				meaning: "균형, 조화, 절제, 통합",
+				keywords: "균형, 조화, 절제, 치유"
+			},
+			{
+				name: "The Devil",
+				type: "Major",
+				meaning: "속박, 집착, 물질주의, 그림자 측면",
+				keywords: "속박, 집착, 유혹, 물질주의"
+			},
+			{
+				name: "The Tower",
+				type: "Major",
+				meaning: "급격한 변화, 파괴, 계시, 해방",
+				keywords: "파괴, 급변, 계시, 해방"
+			},
+			{
+				name: "The Star",
+				type: "Major",
+				meaning: "희망, 영감, 평온, 치유",
+				keywords: "희망, 영감, 평화, 안내"
+			},
+			{
+				name: "The Moon",
+				type: "Major",
+				meaning: "환상, 불안, 직관, 잠재의식",
+				keywords: "환상, 불안, 직관, 미스터리"
+			},
+			{
+				name: "The Sun",
+				type: "Major",
+				meaning: "기쁨, 성공, 활력, 긍정",
+				keywords: "기쁨, 성공, 명료함, 활력"
+			},
+			{
+				name: "Judgement",
+				type: "Major",
+				meaning: "부활, 각성, 새로운 소명",
+				keywords: "부활, 심판, 각성, 소명"
+			},
+			{
+				name: "The World",
+				type: "Major",
+				meaning: "완성, 통합, 성취, 완료",
+				keywords: "완성, 성취, 통합, 여행"
+			},
+
+			// Cups (감정, 관계)
+			{
+				name: "Ace of Cups",
+				type: "Minor",
+				meaning: "새로운 감정의 시작, 사랑의 가능성",
+				keywords: "새로운 사랑, 직관, 감정의 시작"
+			},
+			// Cups (감정, 관계) 계속
+			{
+				name: "Two of Cups",
+				type: "Minor",
+				meaning: "파트너십, 사랑의 연합, 상호 이해",
+				keywords: "연합, 파트너십, 조화로운 관계"
+			},
+			{
+				name: "Three of Cups",
+				type: "Minor",
+				meaning: "축하, 우정, 공동체, 기쁨",
+				keywords: "축하, 우정, 즐거움, 사교"
+			},
+			{
+				name: "Four of Cups",
+				type: "Minor",
+				meaning: "명상, 재평가, 불만족",
+				keywords: "명상, 무관심, 재평가, 권태"
+			},
+			{
+				name: "Five of Cups",
+				type: "Minor",
+				meaning: "상실, 후회, 실망",
+				keywords: "상실, 슬픔, 후회, 치유"
+			},
+			{
+				name: "Six of Cups",
+				type: "Minor",
+				meaning: "과거, 향수, 순수한 사랑",
+				keywords: "추억, 향수, 순수, 선물"
+			},
+			{
+				name: "Seven of Cups",
+				type: "Minor",
+				meaning: "환상, 선택, 꿈",
+				keywords: "선택, 환상, 가능성, 혼란"
+			},
+			{
+				name: "Eight of Cups",
+				type: "Minor",
+				meaning: "포기, 떠남, 새로운 방향",
+				keywords: "떠남, 변화, 새로운 방향"
+			},
+			{
+				name: "Nine of Cups",
+				type: "Minor",
+				meaning: "만족, 행복, 소원성취",
+				keywords: "만족, 행복, 소원, 풍요"
+			},
+			{
+				name: "Ten of Cups",
+				type: "Minor",
+				meaning: "완벽한 사랑, 조화, 가족의 행복",
+				keywords: "행복, 조화, 가족, 완성"
+			},
+			{
+				name: "Page of Cups",
+				type: "Minor",
+				meaning: "창의적 시작, 직관적 메시지",
+				keywords: "창의성, 직관, 메시지"
+			},
+			{
+				name: "Knight of Cups",
+				type: "Minor",
+				meaning: "로맨스, 매력, 예술적 추구",
+				keywords: "로맨스, 매력, 이상주의"
+			},
+			{
+				name: "Queen of Cups",
+				type: "Minor",
+				meaning: "직관, 감성, 양육",
+				keywords: "직관, 감성, 공감, 지혜"
+			},
+			{
+				name: "King of Cups",
+				type: "Minor",
+				meaning: "감정적 통제, 지혜, 창의성",
+				keywords: "균형, 지혜, 감정적 통제"
+			},
+
+			// Wands (열정, 영감)
+			{
+				name: "Ace of Wands",
+				type: "Minor",
+				meaning: "새로운 시작, 영감, 창조적 불꽃",
+				keywords: "시작, 영감, 창조력"
+			},
+			{
+				name: "Two of Wands",
+				type: "Minor",
+				meaning: "계획, 결정, 미래에 대한 전망",
+				keywords: "계획, 결정, 가능성"
+			},
+			{
+				name: "Three of Wands",
+				type: "Minor",
+				meaning: "확장, 기회, 모험",
+				keywords: "확장, 기회, 성장"
+			},
+			{
+				name: "Four of Wands",
+				type: "Minor",
+				meaning: "축하, 안정, 성취",
+				keywords: "축하, 안정, 가정"
+			},
+			{
+				name: "Five of Wands",
+				type: "Minor",
+				meaning: "경쟁, 갈등, 도전",
+				keywords: "경쟁, 갈등, 성장"
+			},
+			{
+				name: "Six of Wands",
+				type: "Minor",
+				meaning: "승리, 성공, 인정",
+				keywords: "승리, 성공, 자부심"
+			},
+			{
+				name: "Seven of Wands",
+				type: "Minor",
+				meaning: "도전, 경쟁, 용기",
+				keywords: "도전, 방어, 결단"
+			},
+			{
+				name: "Eight of Wands",
+				type: "Minor",
+				meaning: "빠른 행동, 진전, 소통",
+				keywords: "속도, 진전, 소통"
+			},
+			{
+				name: "Nine of Wands",
+				type: "Minor",
+				meaning: "인내, 끈기, 마지막 시도",
+				keywords: "인내, 끈기, 회복력"
+			},
+			{
+				name: "Ten of Wands",
+				type: "Minor",
+				meaning: "부담, 책임, 성취",
+				keywords: "부담, 책임, 완성"
+			},
+			{
+				name: "Page of Wands",
+				type: "Minor",
+				meaning: "새로운 아이디어, 열정, 모험",
+				keywords: "열정, 모험, 가능성"
+			},
+			{
+				name: "Knight of Wands",
+				type: "Minor",
+				meaning: "행동, 모험, 열정",
+				keywords: "행동, 모험, 에너지"
+			},
+			{
+				name: "Queen of Wands",
+				type: "Minor",
+				meaning: "자신감, 열정, 매력",
+				keywords: "자신감, 열정, 활력"
+			},
+			{
+				name: "King of Wands",
+				type: "Minor",
+				meaning: "비전, 리더십, 창조성",
+				keywords: "리더십, 비전, 카리스마"
+			},
+			    // Swords (사고, 갈등)
+			{
+				name: "Ace of Swords",
+				type: "Minor",
+				meaning: "명확성, 진실, 새로운 통찰",
+				keywords: "진실, 명확성, 돌파구"
+			},
+			{
+				name: "Two of Swords",
+				type: "Minor",
+				meaning: "결정, 교착상태, 균형",
+				keywords: "선택, 교착상태, 중립"
+			},
+			{
+				name: "Three of Swords",
+				type: "Minor",
+				meaning: "상처, 슬픔, 이별",
+				keywords: "상처, 슬픔, 고통"
+			},
+			{
+				name: "Four of Swords",
+				type: "Minor",
+				meaning: "휴식, 회복, 명상",
+				keywords: "휴식, 회복, 재충전"
+			},
+			{
+				name: "Five of Swords",
+				type: "Minor",
+				meaning: "갈등, 패배, 굴욕",
+				keywords: "갈등, 패배, 경쟁"
+			},
+			{
+				name: "Six of Swords",
+				type: "Minor",
+				meaning: "전환, 여행, 회복",
+				keywords: "전환, 이동, 치유"
+			},
+			{
+				name: "Seven of Swords",
+				type: "Minor",
+				meaning: "속임수, 전략, 회피",
+				keywords: "속임수, 전략, 도피"
+			},
+			{
+				name: "Eight of Swords",
+				type: "Minor",
+				meaning: "제한, 속박, 자기 제한",
+				keywords: "제한, 속박, 두려움"
+			},
+			{
+				name: "Nine of Swords",
+				type: "Minor",
+				meaning: "불안, 걱정, 악몽",
+				keywords: "불안, 걱정, 공포"
+			},
+			{
+				name: "Ten of Swords",
+				type: "Minor",
+				meaning: "끝, 패배, 새로운 시작",
+				keywords: "종말, 패배, 재생"
+			},
+			{
+				name: "Page of Swords",
+				type: "Minor",
+				meaning: "새로운 아이디어, 호기심, 감시",
+				keywords: "호기심, 지성, 경계"
+			},
+			{
+				name: "Knight of Swords",
+				type: "Minor",
+				meaning: "행동, 야망, 결단력",
+				keywords: "행동, 야망, 공격성"
+			},
+			{
+				name: "Queen of Swords",
+				type: "Minor",
+				meaning: "명석함, 독립성, 직접성",
+				keywords: "지성, 독립, 명확성"
+			},
+			{
+				name: "King of Swords",
+				type: "Minor",
+				meaning: "지성, 권위, 진실",
+				keywords: "권위, 지성, 정의"
+			},
+
+			// Pentacles (물질, 실용)
+			{
+				name: "Ace of Pentacles",
+				type: "Minor",
+				meaning: "새로운 기회, 번영, 물질적 시작",
+				keywords: "기회, 번영, 풍요"
+			},
+			{
+				name: "Two of Pentacles",
+				type: "Minor",
+				meaning: "균형, 적응, 우선순위",
+				keywords: "균형, 유연성, 변화"
+			},
+			{
+				name: "Three of Pentacles",
+				type: "Minor",
+				meaning: "팀워크, 숙련, 협력",
+				keywords: "협력, 기술, 인정"
+			},
+			{
+				name: "Four of Pentacles",
+				type: "Minor",
+				meaning: "보안, 소유, 안정",
+				keywords: "보안, 소유, 통제"
+			},
+			{
+				name: "Five of Pentacles",
+				type: "Minor",
+				meaning: "어려움, 빈곤, 고립",
+				keywords: "어려움, 손실, 고립"
+			},
+			{
+				name: "Six of Pentacles",
+				type: "Minor",
+				meaning: "관용, 나눔, 수용",
+				keywords: "관용, 나눔, 균형"
+			},
+			{
+				name: "Seven of Pentacles",
+				type: "Minor",
+				meaning: "평가, 인내, 투자",
+				keywords: "평가, 인내, 성장"
+			},
+			{
+				name: "Eight of Pentacles",
+				type: "Minor",
+				meaning: "숙련, 완성도, 헌신",
+				keywords: "기술, 완성도, 학습"
+			},
+			{
+				name: "Nine of Pentacles",
+				type: "Minor",
+				meaning: "독립, 풍요, 자급자족",
+				keywords: "풍요, 독립, 성취"
+			},
+			{
+				name: "Ten of Pentacles",
+				type: "Minor",
+				meaning: "부, 유산, 가족",
+				keywords: "부, 안정, 유산"
+			},
+			{
+				name: "Page of Pentacles",
+				type: "Minor",
+				meaning: "학습, 실용성, 신뢰",
+				keywords: "학습, 기회, 성실"
+			},
+			{
+				name: "Knight of Pentacles",
+				type: "Minor",
+				meaning: "근면, 책임감, 신뢰성",
+				keywords: "신뢰성, 근면, 헌신"
+			},
+			{
+				name: "Queen of Pentacles",
+				type: "Minor",
+				meaning: "풍요, 양육, 실용성",
+				keywords: "풍요, 양육, 실용"
+			},
+			{
+				name: "King of Pentacles",
+				type: "Minor",
+				meaning: "부, 사업, 실용적 성공",
+				keywords: "성공, 풍요, 안정"
+			}
+		];
+
+		// 검색 기능
+		document.getElementById('searchBox').addEventListener('input', (e) => {
+			const searchTerm = e.target.value.toLowerCase();
+			const filteredCards = tarotCards.filter(card => 
+				card.name.toLowerCase().includes(searchTerm) ||
+				card.keywords.toLowerCase().includes(searchTerm) ||
+				card.meaning.toLowerCase().includes(searchTerm)
+			);
+			renderCards(filteredCards);
+		});
+
+		// 카드 렌더링 함수
+		function createCardElement(card) {
+			return `
+				<div class="card">
+					<h2>${card.name}</h2>
+					<span class="card-type ${card.type}">${card.type}</span>
+					<div class="details">
+						<p>${card.meaning}</p>
+						<div class="keywords">키워드: ${card.keywords}</div>
+					</div>
+				</div>
+			`;
+		}
+
+		function renderCards(cards) {
+			const cardList = document.getElementById('cardList');
+			cardList.innerHTML = cards.map(card => createCardElement(card)).join('');
+
+			// 카드 클릭 이벤트
+			document.querySelectorAll('.card').forEach(card => {
+				card.addEventListener('click', () => {
+					const details = card.querySelector('.details');
+					details.classList.toggle('active');
+				});
+			});
+		}
+
+		// 초기 렌더링
+		renderCards(tarotCards);
+    </script>
+</body>
+</html>
