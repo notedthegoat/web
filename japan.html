@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>히라가나 & 카타카나 퀴즈</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
+        }
+        .character {
+            font-size: 10em;
+            margin-bottom: 20px;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            width: 80%;
+            max-width: 400px;
+        }
+        .option {
+            background-color: #fff;
+            border: 2px solid #2196F3;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 5px 0;
+            font-size: 1.5em;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .option:hover {
+            background-color: #e0f7fa;
+        }
+        .score {
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <div class="character" id="character">あ</div>
+    <div class="options" id="options">
+        <!-- Options will be dynamically generated here -->
+    </div>
+    <div class="score" id="score">틀린 개수: 0 / 0</div>
+
+    <script>
+        const hiragana = [
+            { char: 'あ', romaji: 'a' }, { char: 'い', romaji: 'i' }, { char: 'う', romaji: 'u' },
+            { char: 'え', romaji: 'e' }, { char: 'お', romaji: 'o' },
+            { char: 'か', romaji: 'ka' }, { char: 'き', romaji: 'ki' }, { char: 'く', romaji: 'ku' },
+            { char: 'け', romaji: 'ke' }, { char: 'こ', romaji: 'ko' },
+            { char: 'さ', romaji: 'sa' }, { char: 'し', romaji: 'shi' }, { char: 'す', romaji: 'su' },
+            { char: 'せ', romaji: 'se' }, { char: 'そ', romaji: 'so' },
+            { char: 'た', romaji: 'ta' }, { char: 'ち', romaji: 'chi' }, { char: 'つ', romaji: 'tsu' },
+            { char: 'て', romaji: 'te' }, { char: 'と', romaji: 'to' },
+            { char: 'な', romaji: 'na' }, { char: 'に', romaji: 'ni' }, { char: 'ぬ', romaji: 'nu' },
+            { char: 'ね', romaji: 'ne' }, { char: 'の', romaji: 'no' },
+            { char: 'は', romaji: 'ha' }, { char: 'ひ', romaji: 'hi' }, { char: 'ふ', romaji: 'fu' },
+            { char: 'へ', romaji: 'he' }, { char: 'ほ', romaji: 'ho' },
+            { char: 'ま', romaji: 'ma' }, { char: 'み', romaji: 'mi' }, { char: 'む', romaji: 'mu' },
+            { char: 'め', romaji: 'me' }, { char: 'も', romaji: 'mo' },
+            { char: 'や', romaji: 'ya' }, { char: 'ゆ', romaji: 'yu' }, { char: 'よ', romaji: 'yo' },
+            { char: 'ら', romaji: 'ra' }, { char: 'り', romaji: 'ri' }, { char: 'る', romaji: 'ru' },
+            { char: 'れ', romaji: 're' }, { char: 'ろ', romaji: 'ro' },
+            { char: 'わ', romaji: 'wa' }, { char: 'を', romaji: 'wo' }, { char: 'ん', romaji: 'n' }
+        ];
+
+        const katakana = [
+            { char: 'ア', romaji: 'a' }, { char: 'イ', romaji: 'i' }, { char: 'ウ', romaji: 'u' },
+            { char: 'エ', romaji: 'e' }, { char: 'オ', romaji: 'o' },
+            { char: 'カ', romaji: 'ka' }, { char: 'キ', romaji: 'ki' }, { char: 'ク', romaji: 'ku' },
+            { char: 'ケ', romaji: 'ke' }, { char: 'コ', romaji: 'ko' },
+            { char: 'サ', romaji: 'sa' }, { char: 'シ', romaji: 'shi' }, { char: 'ス', romaji: 'su' },
+            { char: 'セ', romaji: 'se' }, { char: 'ソ', romaji: 'so' },
+            { char: 'タ', romaji: 'ta' }, { char: 'チ', romaji: 'chi' }, { char: 'ツ', romaji: 'tsu' },
+            { char: 'テ', romaji: 'te' }, { char: 'ト', romaji: 'to' },
+            { char: 'ナ', romaji: 'na' }, { char: 'ニ', romaji: 'ni' }, { char: 'ヌ', romaji: 'nu' },
+            { char: 'ネ', romaji: 'ne' }, { char: 'ノ', romaji: 'no' },
+            { char: 'ハ', romaji: 'ha' }, { char: 'ヒ', romaji: 'hi' }, { char: 'フ', romaji: 'fu' },
+            { char: 'ヘ', romaji: 'he' }, { char: 'ホ', romaji: 'ho' },
+            { char: 'マ', romaji: 'ma' }, { char: 'ミ', romaji: 'mi' }, { char: 'ム', romaji: 'mu' },
+            { char: 'メ', romaji: 'me' }, { char: 'モ', romaji: 'mo' },
+            { char: 'ヤ', romaji: 'ya' }, { char: 'ユ', romaji: 'yu' }, { char: 'ヨ', romaji: 'yo' },
+            { char: 'ラ', romaji: 'ra' }, { char: 'リ', romaji: 'ri' }, { char: 'ル', romaji: 'ru' },
+            { char: 'レ', romaji: 're' }, { char: 'ロ', romaji: 'ro' },
+            { char: 'ワ', romaji: 'wa' }, { char: 'ヲ', romaji: 'wo' }, { char: 'ン', romaji: 'n' }
+        ];
+
+        const allCharacters = [...hiragana, ...katakana];
+        let totalQuestions = 0;
+        let incorrectAnswers = 0;
+
+        function getRandomInt(max) {
+            return Math.floor(Math.random() * max);
+        }
+
+        function updateScore() {
+            const scoreElement = document.getElementById('score');
+            scoreElement.textContent = `틀린 개수: ${incorrectAnswers} / ${totalQuestions}`;
+        }
+
+        function generateQuiz() {
+            const characterElement = document.getElementById('character');
+            const optionsElement = document.getElementById('options');
+
+            // Select a random character
+            const randomIndex = getRandomInt(allCharacters.length);
+            const correctCharacter = allCharacters[randomIndex];
+
+            // Display the character
+            characterElement.textContent = correctCharacter.char;
+
+            // Generate options
+            const options = new Set();
+            options.add(correctCharacter.romaji);
+
+            while (options.size < 4) {
+                const randomOption = allCharacters[getRandomInt(allCharacters.length)].romaji;
+                options.add(randomOption);
+            }
+
+            // Shuffle options
+            const shuffledOptions = Array.from(options).sort(() => Math.random() - 0.5);
+
+            // Display options
+            optionsElement.innerHTML = '';
+            shuffledOptions.forEach(option => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'option';
+                optionElement.textContent = option;
+                optionElement.onclick = () => {
+                    totalQuestions++;
+                    if (option === correctCharacter.romaji) {
+                        alert('정답입니다!');
+                    } else {
+                        incorrectAnswers++;
+                        alert(`틀렸습니다. 정답은 ${correctCharacter.romaji}입니다.`);
+                    }
+                    updateScore();
+                    generateQuiz();
+                };
+                optionsElement.appendChild(optionElement);
+            });
+        }
+
+        // Initialize the quiz
+        generateQuiz();
+    </script>
+</body>
+</html>
