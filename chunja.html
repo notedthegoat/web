@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>천자문 퀴즈</title>
+    <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/earlyaccess/cwtexkai.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            text-align: center;
+            padding: 20px;
+        }
+        button {
+            background-color: #1e90ff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 25px;
+        }
+        button:hover {
+            background-color: #4682b4;
+        }
+        .highlight-button {
+            background-color: #ff4500;
+        }
+        .highlight-button:hover {
+            background-color: #ff6347;
+        }
+        .hidden {
+            display: none;
+        }
+        .question-box {
+            font-family: 'cwTeXKai', sans-serif;
+            font-size: 144px;
+            background-color: #ffffff;
+            color: #000000;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px auto;
+            display: inline-block;
+            width: 80%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .feedback-box {
+            font-size: 32px;
+            color: #ffffff;
+            background-color: rgba(0, 0, 0, 0.9);
+            padding: 150px;
+            border-radius: 10px;
+            margin: 0 auto;
+            width: 80%;
+            height: 50%;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+        }
+        #menu {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #stats {
+            margin-bottom: 20px;
+            font-size: 18px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        #stats.hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>천자문 퀴즈</h1>
+    <h3 id="practiceMode" class="hidden">(오답연습)</h3>
+    <div id="stats" class="hidden">
+        <p>총문제: 1000문제</p>
+        <p>맞춘 수: <span id="correctCount">0</span>개</p>
+        <p>틀린 수: <span id="wrongCount">0</span>개</p>
+    </div>
+    <div id="menu">
+        <button id="startQuizBtn" onclick="startQuiz(false)">천자문 퀴즈</button>
+        <button id="startPracticeBtn" onclick="startQuiz(true)">오답 연습</button>
+    </div>
+
+    <div id="quiz" class="hidden">
+        <h2>다음 한자의 뜻은 무엇일까요?</h2>
+        <div id="question" class="question-box"></div>
+        <div id="options"></div>
+        <button onclick="nextQuestion()">다음 문제</button>
+        <button class="highlight-button" onclick="restart()">메인으로</button>
+    </div>
+
+    <div id="result" class="hidden">
+        <h2>퀴즈 종료!</h2>
+        <p>맞춘 문제: <span id="correctCountResult"></span></p>
+        <p>오답 문제: <span id="wrongCountResult"></span></p>
+        <button onclick="restart()">처음으로</button>
+    </div>
+
+    <div id="feedback" class="hidden feedback-box"></div>
+
+    <script>
+        let quizData = [];
+        let wrongAnswers = loadWrongAnswers();
+        let currentQuestion = null;
+        let score = 0;
+        let totalQuestions = 0;
+        let isPracticeMode = false;
+		let originalQuizData = [];  // 전체 데이터를 저장할 변수 추가
+        const totalQuizQuestions = 1000;
+
+		// loadQuizData 함수 수정
+		async function loadQuizData() {
+			try {
+				const response = await fetch('chunja.json');
+				const data = await response.json();
+				quizData = [...data];
+				originalQuizData = [...data];  // 원본 데이터 저장
+			} catch (error) {
+				console.error('Failed to load quiz data:', error);
+			}
+		}
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('correctCount').textContent = score;
+            document.getElementById('wrongCount').textContent = wrongAnswers.length;
+        }
+
+        function startQuiz(practiceMode) {
+            totalQuestions = 0;
+            score = 0;
+            isPracticeMode = practiceMode;
+
+            if (practiceMode) {
+                if (wrongAnswers.length === 0) {
+                    alert('오답이 없습니다!');
+                    return;
+                }
+                quizData = [...wrongAnswers];
+            } else {
+                if (quizData.length === 0) {
+                    alert('문제 데이터가 없습니다!');
+                    return;
+                }
+                quizData = [...quizData];
+            }
+
+            shuffle(quizData);
+            document.getElementById('menu').style.display = 'none';
+            document.getElementById('practiceMode').classList.toggle('hidden', !practiceMode);
+            document.getElementById('stats').classList.remove('hidden');
+            document.getElementById('quiz').classList.remove('hidden');
+            nextQuestion();
+        }
+
+        // nextQuestion 함수 수정
+		function nextQuestion() {
+			if (!quizData || quizData.length === 0) {
+				endQuiz();
+				return;
+			}
+
+			currentQuestion = quizData.splice(0, 1)[0];
+
+			// 옵션 풀 생성 시 originalQuizData 사용
+			let optionsPool = originalQuizData
+				.filter(item => item.h !== currentQuestion.h)
+				.slice();  // 복사본 생성
+			
+			shuffle(optionsPool);
+			const slicedOptions = [currentQuestion, ...optionsPool.slice(0, 3)];
+			shuffle(slicedOptions);
+
+			document.getElementById('question').textContent = currentQuestion.h;
+
+			const optionsDiv = document.getElementById('options');
+			optionsDiv.innerHTML = '';
+
+			slicedOptions.forEach(option => {
+				const button = document.createElement('button');
+				button.textContent = option.m;
+				button.style.borderRadius = '25px';
+				button.onclick = () => checkAnswer(option);
+				optionsDiv.appendChild(button);
+			});
+
+			updateStats();
+		}
+
+        function checkAnswer(selected) {
+            const feedbackDiv = document.getElementById('feedback');
+            if (selected === currentQuestion) {
+                score++;
+                if (isPracticeMode) {
+                    wrongAnswers = wrongAnswers.filter(item => item.h !== currentQuestion.h);
+                    saveWrongAnswers();
+                }
+                feedbackDiv.textContent = '정답입니다!';
+            } else {
+                if (!wrongAnswers.some(item => item.h === currentQuestion.h)) {
+                    wrongAnswers.push(currentQuestion);
+                    saveWrongAnswers();
+                }
+                feedbackDiv.textContent = `오답입니다! 정답은 '${currentQuestion.m}' 입니다.`;
+            }
+            feedbackDiv.classList.remove('hidden');
+            feedbackDiv.onclick = () => feedbackDiv.classList.add('hidden');
+            totalQuestions++;
+            nextQuestion();
+        }
+
+        function endQuiz() {
+            document.getElementById('quiz').classList.add('hidden');
+            document.getElementById('result').classList.remove('hidden');
+            document.getElementById('correctCountResult').textContent = score;
+            document.getElementById('wrongCountResult').textContent = wrongAnswers.length;
+        }
+
+        function restart() {
+            document.getElementById('result').classList.add('hidden');
+            document.getElementById('quiz').classList.add('hidden');
+            document.getElementById('stats').classList.add('hidden');
+            document.getElementById('practiceMode').classList.add('hidden');
+            document.getElementById('menu').style.display = 'flex';
+            loadQuizData();
+        }
+
+        function saveWrongAnswers() {
+            document.cookie = `wrongAnswers=${JSON.stringify(wrongAnswers)}; path=/; max-age=31536000;`;
+        }
+
+        function loadWrongAnswers() {
+            const cookies = document.cookie.split('; ');
+            const cookie = cookies.find(c => c.startsWith('wrongAnswers='));
+            try {
+                return cookie ? JSON.parse(cookie.split('=')[1]) : [];
+            } catch {
+                console.warn('쿠키 데이터 오류: 초기화합니다.');
+                return [];
+            }
+        }
+
+        loadQuizData();
+    </script>
+	<h5>만든사람 : Jeremy</h5>
+</body>
+</html>
