@@ -1,31 +1,98 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>뒷삭정리하기</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
-            color: #333;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             margin: 0;
-            padding: 0;
+            padding: 20px;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            text-align: center;
         }
 
         .container {
             background-color: #ffffff;
-            padding: 20px;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            max-width: 700px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #667eea;
+            margin-top: 0;
+            text-align: center;
+        }
+
+        .creator-box {
+            text-align: center;
+            padding: 15px;
+            background: linear-gradient(135deg, #f8f9ff 0%, #e8ecff 100%);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 2px solid #667eea;
+        }
+
+        .creator-box p {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+
+        .creator-box a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+
+        .creator-box a:hover {
+            color: #764ba2;
+        }
+
+        .follow-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 10px;
+            padding: 10px;
+            background: white;
             border-radius: 8px;
-            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
-            max-width: 600px;
-            width: 90%;
-            margin: 20px;
+        }
+
+        .follow-section img {
+            width: 104px;
+            height: 121px;
+            border-radius: 8px;
+        }
+
+        .follow-text {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+            text-align: left;
+        }
+
+        .follow-text strong {
+            color: #333;
+        }
+
+        .follow-text a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .follow-text a:hover {
+            color: #764ba2;
+            text-decoration: underline;
         }
 
         textarea {
@@ -33,25 +100,53 @@
             height: 100px;
             padding: 10px;
             margin-bottom: 15px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
+            border-radius: 8px;
+            border: 2px solid #667eea;
             font-size: 16px;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #764ba2;
+            box-shadow: 0 0 10px rgba(118, 75, 162, 0.2);
+        }
+
+        textarea::placeholder {
+            color: #999;
         }
 
         button {
             width: 100%;
             padding: 15px;
-            background-color: #007bff;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            border-radius: 5px;
-            font-size: 16px;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: all 0.3s;
         }
 
         button:hover {
-            background-color: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        #result {
+            background: #f8f9ff;
+        }
+
+        #count {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #764ba2;
+            color: white;
+            border-radius: 20px;
+            margin-top: 15px;
+            font-weight: bold;
         }
     </style>
     <script>
@@ -81,10 +176,25 @@
 </head>
 <body>
     <div class="container">
-        <h1>뒷삭정리하기 (만든이 : Jeremy)</h1>
+        <h1>🔍 뒷삭정리하기</h1>
+        
+        <div class="creator-box">
+            <p>
+                만든이: <a href="https://www.threads.com/@jeremy.s.0416?xmt=AQF00jBCTUkLMSu5ixNLrxiI9eck747lbbZI8vDt2-IRegg" target="_blank">Jeremy (@jeremy.s.0416)</a>
+            </p>
+            <div class="follow-section">
+                <img src="thank-you-bow.jpg" alt="감사합니다" onerror="this.style.display='none'">
+                <div class="follow-text">
+                    <strong>만든놈 팔로우 해주셔도 됩니다 🙏</strong><br>
+                    도움이 되셨다면 응원 부탁드려요!<br>
+                    <a href="https://www.threads.com/@jeremy.s.0416?xmt=AQF00jBCTUkLMSu5ixNLrxiI9eck747lbbZI8vDt2-IRegg" target="_blank">👉 팔로우 하러 가기</a>
+                </div>
+            </div>
+        </div>
+        
         <textarea id="aGroup" placeholder="팔로워그룹"></textarea>
         <textarea id="bGroup" placeholder="팔로잉그룹"></textarea>
-        <button onclick="cleanUpFollowers()">뒷삭정리하기</button>
+        <button onclick="cleanUpFollowers()">🚀 뒷삭정리하기</button>
         <textarea id="result" placeholder="뒷삭한인간들(Bye~)" readonly></textarea>
         <p id="count">뒷삭한 인간들: 0명</p>
     </div>
