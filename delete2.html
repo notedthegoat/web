@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>스레드 뒷삭정리하기 (JSON)</title>
+<style>
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    margin: 0;
+    padding: 20px;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.container {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    max-width: 700px;
+    width: 100%;
+}
+h1 {
+    color: #667eea;
+    margin-top: 0;
+    text-align: center;
+}
+.creator-box {
+    text-align: center;
+    padding: 15px;
+    background: linear-gradient(135deg, #f8f9ff 0%, #e8ecff 100%);
+    border-radius: 10px;
+    margin-bottom: 20px;
+    border: 2px solid #667eea;
+}
+.creator-box a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s;
+}
+.creator-box a:hover {
+    color: #764ba2;
+}
+.follow-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 10px;
+    padding: 10px;
+    background: white;
+    border-radius: 8px;
+}
+.follow-section img {
+    width: 104px;
+    height: 121px;
+    border-radius: 8px;
+}
+.follow-text {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.6;
+}
+.file-input-wrapper {
+    margin: 20px 0;
+    padding: 20px;
+    border: 2px dashed #667eea;
+    border-radius: 10px;
+    text-align: center;
+    background: #f8f9ff;
+}
+input[type="file"] {
+    display: none;
+}
+.file-label {
+    display: inline-block;
+    padding: 12px 30px;
+    background: #667eea;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: bold;
+}
+.file-label:hover {
+    background: #5568d3;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+.status {
+    color: #28a745;
+    font-weight: bold;
+    margin-top: 10px;
+    display: none;
+}
+.process-btn {
+    width: 100%;
+    padding: 15px;
+    background: #764ba2;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: all 0.3s;
+    display: none;
+}
+.process-btn:hover:not(:disabled) {
+    background: #5a367a;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(118, 75, 162, 0.3);
+}
+.process-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+#result {
+    margin-top: 20px;
+    padding: 20px;
+    background: #f8f9ff;
+    border-radius: 10px;
+    min-height: 200px;
+    max-height: 400px;
+    overflow-y: auto;
+    display: none;
+}
+.unfollower-item {
+    padding: 12px;
+    margin: 8px 0;
+    background: white;
+    border-left: 4px solid #764ba2;
+    border-radius: 5px;
+    transition: all 0.2s;
+}
+.unfollower-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+.unfollower-item a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 500;
+}
+.unfollower-item a:hover {
+    color: #764ba2;
+    text-decoration: underline;
+}
+.count-badge {
+    display: inline-block;
+    padding: 8px 16px;
+    background: #764ba2;
+    color: white;
+    border-radius: 20px;
+    margin: 10px 0;
+    font-weight: bold;
+}
+.info-text {
+    color: #666;
+    font-size: 14px;
+    margin-top: 10px;
+}
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>🔍 스레드 뒷삭정리하기</h1>
+    
+    <div class="creator-box">
+        <p style="margin:0 0 10px 0; color:#333;">
+            만든이: <a href="https://www.threads.com/@jeremy.s.0416?xmt=AQF00jBCTUkLMSu5ixNLrxiI9eck747lbbZI8vDt2-IRegg" target="_blank">Jeremy (@jeremy.s.0416)</a>
+        </p>
+        <div class="follow-section">
+            <img src="thank-you-bow.jpg" alt="감사합니다" onerror="this.style.display='none'">
+            <div class="follow-text">
+                <strong>만든놈 팔로우 해주셔도 됩니다 🙏</strong><br>
+                도움이 되셨다면 응원 부탁드려요!<br>
+				<a href="https://www.threads.com/@jeremy.s.0416?xmt=AQF00jBCTUkLMSu5ixNLrxiI9eck747lbbZI8vDt2-IRegg" target="_blank">👉팔로우 하러 가기</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="file-input-wrapper">
+        <label for="followerFile" class="file-label">📁 팔로워 JSON 업로드</label>
+        <input type="file" id="followerFile" accept=".json">
+        <p class="info-text">followers.json 파일을 선택하세요</p>
+        <div class="status" id="followerStatus">✅ 팔로워 0명 로드됨</div>
+    </div>
+    
+    <div class="file-input-wrapper">
+        <label for="followingFile" class="file-label">📁 팔로잉 JSON 업로드</label>
+        <input type="file" id="followingFile" accept=".json">
+        <p class="info-text">following.json 파일을 선택하세요</p>
+        <div class="status" id="followingStatus">✅ 팔로잉 0명 로드됨</div>
+    </div>
+    
+    <button class="process-btn" id="processBtn" onclick="processUnfollowers()">
+        🚀 뒷삭정리하기
+    </button>
+    
+    <div id="result"></div>
+</div>
+
+<script>
+let followerData = new Set();
+let followingData = [];
+
+// UTF-8 잘못된 인코딩 수정 함수
+function fixEncoding(str) {
+    try {
+        const bytes = new Uint8Array([...str].map(c => c.charCodeAt(0)));
+        const decoder = new TextDecoder('utf-8');
+        return decoder.decode(bytes);
+    } catch (e) {
+        return str;
+    }
+}
+
+document.getElementById('followerFile').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            try {
+                const text = event.target.result;
+                const json = JSON.parse(text);
+                
+                followerData = extractFollowerIds(json);
+                const status = document.getElementById('followerStatus');
+                status.textContent = `✅ 팔로워 ${followerData.size}명 로드됨`;
+                status.style.display = 'block';
+                checkReadyToProcess();
+            } catch (error) {
+                alert('팔로워 JSON 파일 읽기 오류: ' + error.message);
+            }
+        };
+        reader.readAsText(file, 'UTF-8');
+    }
+});
+
+document.getElementById('followingFile').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            try {
+                const text = event.target.result;
+                const json = JSON.parse(text);
+                
+                followingData = extractFollowingData(json);
+                const status = document.getElementById('followingStatus');
+                status.textContent = `✅ 팔로잉 ${followingData.length}명 로드됨`;
+                status.style.display = 'block';
+                checkReadyToProcess();
+            } catch (error) {
+                alert('팔로잉 JSON 파일 읽기 오류: ' + error.message);
+            }
+        };
+        reader.readAsText(file, 'UTF-8');
+    }
+});
+
+function extractFollowerIds(json) {
+    const ids = new Set();
+    const followers = json.text_post_app_text_post_app_followers || [];
+    
+    followers.forEach(item => {
+        if (item.string_list_data && item.string_list_data[0] && item.string_list_data[0].value) {
+            ids.add(item.string_list_data[0].value);
+        }
+    });
+    
+    return ids;
+}
+
+function extractFollowingData(json) {
+    const users = [];
+    const following = json.text_post_app_text_post_app_following || [];
+    
+    following.forEach(item => {
+        if (item.string_list_data && item.string_list_data[0]) {
+            const userData = item.string_list_data[0];
+            if (userData.value) {
+                let displayName = item.title || userData.value;
+                displayName = fixEncoding(displayName);
+                
+                users.push({
+                    id: userData.value,
+                    name: displayName,
+                    href: userData.href || `https://www.threads.net/@${userData.value}`
+                });
+            }
+        }
+    });
+    
+    return users;
+}
+
+function checkReadyToProcess() {
+    const btn = document.getElementById('processBtn');
+    if (followerData.size > 0 && followingData.length > 0) {
+        btn.style.display = 'block';
+        btn.disabled = false;
+    }
+}
+
+function processUnfollowers() {
+    const unfollowers = followingData.filter(user => !followerData.has(user.id));
+    
+    const resultDiv = document.getElementById('result');
+    resultDiv.style.display = 'block';
+    
+    if (unfollowers.length === 0) {
+        resultDiv.innerHTML = `
+            <div style="text-align:center; padding:30px;">
+                <h2 style="color:#667eea;">🎉 축하합니다!</h2>
+                <p>뒷삭한 사람이 없습니다.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    let html = `<div class="count-badge">🚨 뒷삭한 인간들: ${unfollowers.length}명</div><div style="margin-top:20px;">`;
+    
+    unfollowers.forEach(user => {
+        const displayName = user.name;
+        html += `
+            <div class="unfollower-item">
+                <a href="${user.href}" target="_blank">
+                    @${user.id} (${displayName})
+                </a>
+            </div>
+        `;
+    });
+    
+    html += '</div>';
+    resultDiv.innerHTML = html;
+}
+</script>
+</body>
+</html>
