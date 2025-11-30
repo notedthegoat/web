@@ -5,186 +5,360 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>스레드 뒷삭정리하기 (JSON)</title>
 <style>
+* {
+    box-sizing: border-box;
+}
+
 body {
     font-family: 'Segoe UI', Arial, sans-serif;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     margin: 0;
-    padding: 20px;
+    padding: 15px;
     min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
 }
+
 .container {
     background: white;
-    padding: 30px;
+    padding: 25px;
     border-radius: 15px;
     box-shadow: 0 10px 40px rgba(0,0,0,0.2);
     max-width: 700px;
     width: 100%;
 }
+
 h1 {
     color: #667eea;
     margin-top: 0;
     text-align: center;
+    font-size: clamp(1.4rem, 5vw, 1.8rem);
 }
+
+/* 사용방법 섹션 */
+.how-to-use {
+    background: linear-gradient(135deg, #fff9e6 0%, #fff3cd 100%);
+    border: 2px solid #ffc107;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.how-to-use-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.how-to-use-header h3 {
+    margin: 0;
+    color: #856404;
+    font-size: 1rem;
+}
+
+.youtube-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 15px;
+    background: #fff;
+    border-radius: 10px;
+    text-decoration: none;
+    transition: all 0.3s;
+    border: 2px solid #ff0000;
+}
+
+.youtube-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 0, 0, 0.2);
+    background: #fff5f5;
+}
+
+.youtube-icon {
+    width: 48px;
+    height: 48px;
+    background: #ff0000;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.youtube-icon svg {
+    width: 28px;
+    height: 28px;
+    fill: white;
+}
+
+.youtube-text {
+    flex: 1;
+}
+
+.youtube-text strong {
+    display: block;
+    color: #333;
+    font-size: 0.95rem;
+    margin-bottom: 3px;
+}
+
+.youtube-text span {
+    color: #ff0000;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+/* 만든이 섹션 */
 .creator-box {
     text-align: center;
-    padding: 15px;
+    padding: 12px 15px;
     background: linear-gradient(135deg, #f8f9ff 0%, #e8ecff 100%);
     border-radius: 10px;
     margin-bottom: 20px;
     border: 2px solid #667eea;
 }
+
+.creator-box p {
+    margin: 0;
+    color: #333;
+    font-size: 0.95rem;
+}
+
 .creator-box a {
     color: #667eea;
     text-decoration: none;
     font-weight: bold;
     transition: color 0.3s;
 }
+
 .creator-box a:hover {
     color: #764ba2;
 }
-.follow-section {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 15px;
-    margin-top: 10px;
-    padding: 10px;
-    background: white;
-    border-radius: 8px;
-}
-.follow-section img {
-    width: 104px;
-    height: 121px;
-    border-radius: 8px;
-}
-.follow-text {
-    font-size: 14px;
-    color: #666;
-    line-height: 1.6;
-}
+
+/* 파일 업로드 섹션 */
 .file-input-wrapper {
-    margin: 20px 0;
+    margin-bottom: 15px;
     padding: 20px;
     border: 2px dashed #667eea;
     border-radius: 10px;
     text-align: center;
     background: #f8f9ff;
+    transition: all 0.3s;
 }
+
+.file-input-wrapper:hover {
+    border-color: #764ba2;
+    background: #f0f2ff;
+}
+
 input[type="file"] {
     display: none;
 }
+
 .file-label {
     display: inline-block;
     padding: 12px 30px;
-    background: #667eea;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.3s;
     font-weight: bold;
+    font-size: 0.95rem;
 }
+
 .file-label:hover {
-    background: #5568d3;
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
 }
+
 .status {
     color: #28a745;
     font-weight: bold;
     margin-top: 10px;
     display: none;
+    padding: 8px;
+    background: #e8f5e9;
+    border-radius: 5px;
 }
+
+.info-text {
+    color: #666;
+    font-size: 13px;
+    margin: 10px 0 0 0;
+}
+
+/* 버튼 */
 .process-btn {
     width: 100%;
     padding: 15px;
-    background: #764ba2;
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
     color: white;
     border: none;
     border-radius: 8px;
     font-size: 18px;
     font-weight: bold;
     cursor: pointer;
-    margin-top: 20px;
+    margin-top: 10px;
+    margin-bottom: 25px;
     transition: all 0.3s;
     display: none;
 }
+
 .process-btn:hover:not(:disabled) {
-    background: #5a367a;
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(118, 75, 162, 0.3);
 }
+
 .process-btn:disabled {
     background: #ccc;
     cursor: not-allowed;
 }
+
+/* 결과 섹션 */
 #result {
-    margin-top: 20px;
     padding: 20px;
     background: #f8f9ff;
     border-radius: 10px;
-    min-height: 200px;
+    min-height: 150px;
     max-height: 400px;
     overflow-y: auto;
     display: none;
+    border-top: 3px solid #667eea;
 }
+
 .unfollower-item {
-    padding: 12px;
+    padding: 12px 15px;
     margin: 8px 0;
     background: white;
     border-left: 4px solid #764ba2;
     border-radius: 5px;
     transition: all 0.2s;
 }
+
 .unfollower-item:hover {
     transform: translateX(5px);
     box-shadow: 0 3px 10px rgba(0,0,0,0.1);
 }
+
 .unfollower-item a {
     color: #667eea;
     text-decoration: none;
     font-weight: 500;
 }
+
 .unfollower-item a:hover {
     color: #764ba2;
     text-decoration: underline;
 }
+
 .count-badge {
     display: inline-block;
-    padding: 8px 16px;
-    background: #764ba2;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
     color: white;
-    border-radius: 20px;
-    margin: 10px 0;
+    border-radius: 25px;
     font-weight: bold;
+    font-size: 1rem;
 }
-.info-text {
-    color: #666;
-    font-size: 14px;
-    margin-top: 10px;
+
+/* 모바일 최적화 */
+@media (max-width: 480px) {
+    body {
+        padding: 10px;
+        align-items: flex-start;
+    }
+
+    .container {
+        padding: 20px 15px;
+    }
+
+    .youtube-link {
+        padding: 10px 12px;
+    }
+
+    .youtube-icon {
+        width: 42px;
+        height: 42px;
+    }
+
+    .youtube-icon svg {
+        width: 24px;
+        height: 24px;
+    }
+
+    .youtube-text strong {
+        font-size: 0.9rem;
+    }
+
+    .youtube-text span {
+        font-size: 0.8rem;
+    }
+
+    .file-input-wrapper {
+        padding: 15px;
+    }
+
+    .file-label {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+    }
+
+    .process-btn {
+        padding: 14px;
+        font-size: 16px;
+    }
+
+    #result {
+        padding: 15px;
+        max-height: 300px;
+    }
+
+    .count-badge {
+        padding: 8px 16px;
+        font-size: 0.9rem;
+    }
+
+    .unfollower-item {
+        padding: 10px 12px;
+        font-size: 0.9rem;
+    }
 }
 </style>
 </head>
 <body>
 <div class="container">
-    <h1>🔍 스레드 뒷삭정리하기</h1>
+    <h1>🔍 스레드 뒷삭정리하기 (JSON)</h1>
     
-    <div class="creator-box">
-        <p style="margin:0 0 10px 0; color:#333;">
-            만든이: <a href="https://www.threads.com/@jeremy.s.0416?xmt=AQF00jBCTUkLMSu5ixNLrxiI9eck747lbbZI8vDt2-IRegg" target="_blank">Jeremy (@jeremy.s.0416)</a>
-        </p>
-        <div class="follow-section">
-            <img src="thank-you-bow.jpg" alt="감사합니다" onerror="this.style.display='none'">
-            <div class="follow-text">
-                <strong>만든놈 팔로우 해주셔도 됩니다 🙏</strong><br>
-                도움이 되셨다면 응원 부탁드려요!<br>
-				<a href="https://www.threads.com/@jeremy.s.0416?xmt=AQF00jBCTUkLMSu5ixNLrxiI9eck747lbbZI8vDt2-IRegg" target="_blank">👉팔로우 하러 가기</a>
-            </div>
+    <!-- 사용방법 섹션 -->
+    <div class="how-to-use">
+        <div class="how-to-use-header">
+            <span style="font-size: 1.3rem;">📖</span>
+            <h3>처음이신가요? 사용방법을 확인하세요!</h3>
         </div>
+        <a href="https://youtu.be/1Z2s1hL2i1I" target="_blank" class="youtube-link">
+            <div class="youtube-icon">
+                <svg viewBox="0 0 24 24">
+                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                </svg>
+            </div>
+            <div class="youtube-text">
+                <strong>📺 사용방법 영상 보기</strong>
+                <span>▶ YouTube에서 확인하기</span>
+            </div>
+        </a>
     </div>
     
+    <!-- 만든이 섹션 -->
+    <div class="creator-box">
+        <p>
+            만든이: <a href="https://www.threads.com/@jeremy.s.0416?xmt=AQF00jBCTUkLMSu5ixNLrxiI9eck747lbbZI8vDt2-IRegg" target="_blank">Jeremy (@jeremy.s.0416)</a>
+        </p>
+    </div>
+    
+    <!-- 파일 업로드 -->
     <div class="file-input-wrapper">
         <label for="followerFile" class="file-label">📁 팔로워 JSON 업로드</label>
         <input type="file" id="followerFile" accept=".json">
@@ -210,7 +384,6 @@ input[type="file"] {
 let followerData = new Set();
 let followingData = [];
 
-// UTF-8 잘못된 인코딩 수정 함수
 function fixEncoding(str) {
     try {
         const bytes = new Uint8Array([...str].map(c => c.charCodeAt(0)));
@@ -325,7 +498,7 @@ function processUnfollowers() {
         return;
     }
     
-    let html = `<div class="count-badge">🚨 뒷삭한 인간들: ${unfollowers.length}명</div><div style="margin-top:20px;">`;
+    let html = `<div style="text-align:center;"><div class="count-badge">🚨 뒷삭한 인간들: ${unfollowers.length}명</div></div><div style="margin-top:15px;">`;
     
     unfollowers.forEach(user => {
         const displayName = user.name;
